@@ -98,7 +98,7 @@ function draw() {
       shipExplosionSound.play();
       textSize(128);
       fill(255, 0, 0);
-      text('LOSER', 200, 300);
+      text('YOU LOSE', 100, 300);
       clearTimeout(army.timer);
       noLoop();
     }
