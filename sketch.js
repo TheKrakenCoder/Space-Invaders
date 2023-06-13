@@ -168,7 +168,7 @@ function draw() {
     text('WINNER', 150, 300);
     clearTimeout(army.timer);
     score += 100;
-    score += (76-numUpdates) * 10;
+    score += (120-numUpdates) * 10;
     text('Score: ' + score, 150, 400);
     noLoop();
   }
