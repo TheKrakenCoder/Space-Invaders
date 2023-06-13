@@ -18,7 +18,8 @@ class Army {
       let alienr = [];
       let w = this.imageWidthPlusBuffer;
       for (let i = 0; i < this.rows; i++) {  // col
-         alienr.push(new Alien(w + i*w, 50+j*50, j%2));
+        // alienr.push(new Alien(w + i*w, 50+j*50, j%2));
+        alienr.push(new Alien(w + i*w, j*50, j%2));
       }
       this.aliens.push(alienr)
     }
@@ -59,15 +60,16 @@ class Army {
     for (let j = 0; j < this.cols; j++) {  // row
       for (let i = 0; i < this.aliens[j].length; i++) {  // col
         this.aliens[j][i].update(deltaX + this.dir*this.deltaX, deltaY);
-        let alienChanceToShoot = map(numAliens, 0, this.cols*this.rows, initalAlienChanceToShoot*3.5, initalAlienChanceToShoot);
-        if (random() < alienChanceToShoot) {
-          this.lasers.push(new Laser(this.aliens[j][i].x, this.aliens[j][i].y))
+        let shootChance = map(numAliens, 0, this.cols*this.rows, alienChanceToShoot*alienChanceToShootScale, alienChanceToShoot);
+        if (random() < shootChance) {
+          let xoff = 20 + random(-10, 10)
+          this.lasers.push(new Laser(this.aliens[j][i].x+xoff, this.aliens[j][i].y))
         }
       }
     }
     
     // play the appropriate move sound
-    alienSounds[this.soundIndex].setVolume(0.5);
+    alienSounds[this.soundIndex].setVolume(0.2);
     alienSounds[this.soundIndex].play();
     this.soundIndex++;
     if (this.soundIndex >= alienSounds.length) this.soundIndex = 0;
@@ -78,6 +80,7 @@ class Army {
     // set a timeout to call this method again
     let updateTime = map(numAliens, 0, this.cols*this.rows, initialUpdateTime/10, initialUpdateTime);
     this.timer = setTimeout(this.update.bind(this), updateTime);
+    numUpdates += 1;
 
     // updateTime = updateTime - 100;
   }
@@ -113,6 +116,33 @@ class Army {
       }
     }
     return true;
+  }
+
+  reachedBottom() {
+    for (let j = 0; j < this.cols; j++) {  // row
+      let rows = this.aliens[j].length;
+      for (let i = rows-1; i >= 0; i--) {  // col
+        if (this.aliens[j][i].y > height-50) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // having this function and reachedBottom is redundant.
+  // this function couls also start at the bottom to be more efficient
+  lowestAlienBottom() {
+    let lowestAlienY = 0;
+    for (let j = 0; j < this.cols; j++) {  // row
+      let rows = this.aliens[j].length;
+      for (let i = rows-1; i >= 0; i--) {  // col
+        if (this.aliens[j][i].y > lowestAlienY) {
+          lowestAlienY =  this.aliens[j][i].y;
+        }
+      }
+    }
+    return lowestAlienY;
   }
 
 }

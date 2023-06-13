@@ -11,7 +11,15 @@ var alienKilledSound;
 var shipBulletSound, shipExplosionSound;
 var initialUpdateTime;
 var ship;
-var initalAlienChanceToShoot;
+var alienChanceToShoot;
+var alienChanceToShootScale;
+var score;
+// var scoreTextP;
+// var scoreP;
+var numUpdates;
+var bunkerTop;
+var difficultyTextP;
+var difficultySlider;
 
 var alienExplosions = [];
 var missiles = [];  // should be part of the ship class
@@ -42,24 +50,39 @@ function setup() {
   alienExplode_img.resize(alien1a_img.width, alien1a_img.height);  // cannot be called in preload()
   army = new Army();
   ship = new Ship();
-  bunkers.push(new Bunker(width/2-50, height - 110));
-  bunkers.push(new Bunker(100, height - 110));
-  bunkers.push(new Bunker(width-200, height - 110));
+  bunkerTop = height-110;
+  bunkers.push(new Bunker(width/2-50, bunkerTop));
+  bunkers.push(new Bunker(100, bunkerTop));
+  bunkers.push(new Bunker(width-200, bunkerTop));
   initialUpdateTime = 1000;
-  initalAlienChanceToShoot = 0.075;
+  // initialUpdateTime = 100;
+  alienChanceToShoot = 0.075;
+  alienChanceToShootScale = 3.5;
+  numUpdates = 0;
+
+  score = 0;
+
+  difficultyTextP = createP("Difficulty: ");
+  difficultySlider = createSlider(0.05, 0.1, alienChanceToShoot, 0.005);
+  // scoreTextP = createP();
+  // scoreTextP.html("Score:");
+  // scoreP = createP();
   // frameRate(1);
 }
 
 function draw() {
   background(0);
+  alienChanceToShoot = difficultySlider.value();
+
+  // scoreP.html(score);
   ship.update();
   ship.show();
+  for (bunker of bunkers) {
+    bunker.show();
+  }
   army.show();
   for (let m = 0; m < alienExplosions.length; m++){
     image(alienExplode_img, alienExplosions[m].x, alienExplosions[m].y);
-  }
-  for (bunker of bunkers) {
-     bunker.show();
   }
 
   // move this code somewhere and call a funtion
@@ -75,8 +98,9 @@ function draw() {
       // console.log("sketch: hit army");
       deadMissile = true;
       missiles.splice(m, 1);
-      alienKilledSound.setVolume(0.5);
+      alienKilledSound.setVolume(0.2);
       alienKilledSound.play();
+      score += 10;
     }
 
     // remove missiles off screen
@@ -94,15 +118,27 @@ function draw() {
 
     // collision
     if (army.lasers[l].checkHitShip(ship)) {
-      shipExplosionSound.setVolume(0.5);
+      shipExplosionSound.setVolume(0.2);
       shipExplosionSound.play();
       textSize(128);
       fill(255, 0, 0);
       text('YOU LOSE', 100, 300);
+      // score += (76-numUpdates) * 10;
+      text('Score: ' + score, 150, 400);
       clearTimeout(army.timer);
       noLoop();
     }
   }  
+
+  if (army.reachedBottom()) {
+    textSize(128);
+    fill(255, 0, 0);
+    text('YOU LOSE', 100, 300);
+    // score += (76-numUpdates) * 10;
+    text('Score: ' + score, 150, 400);
+    clearTimeout(army.timer);
+    noLoop();
+  }
   
   // move this code somewhere and call a funtion
   // BUNKER
@@ -122,11 +158,18 @@ function draw() {
     }
   }
 
+  for (bunker of bunkers) {
+    bunker.checkCollisionWithAliens(army);
+  }
+
   if (army.isDead()) {
     textSize(128);
     fill(0, 200, 0);
     text('WINNER', 150, 300);
     clearTimeout(army.timer);
+    score += 100;
+    score += (76-numUpdates) * 10;
+    text('Score: ' + score, 150, 400);
     noLoop();
   }
 }
@@ -140,7 +183,7 @@ function keyPressed() {
   if (key === ' ') {
     if (missiles.length < 3) {
       missiles.push(new Missile(ship.x, ship.y));
-      shipBulletSound.setVolume(0.5);
+      shipBulletSound.setVolume(0.1);
       shipBulletSound.play();
     }
   }
@@ -158,4 +201,3 @@ function keyReleased() {
     ship.setDir(0);
   }
 }
-

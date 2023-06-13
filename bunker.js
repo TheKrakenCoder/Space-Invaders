@@ -37,4 +37,30 @@ class Bunker {
     return false;
   }
 
+  // checkCollisionWithAliens(army) {
+  //   for (let j = 0; j < this.cols; j++) {  // row
+  //     for (let i = 0; i < this.rows; i++) {  // col
+  //        if (this.cells[j][i].checkCollisionWithAliens(army)) {
+  //         this.cells[j][i].intact = false;
+  //         return true;
+  //        }
+  //     }
+  //   }
+  //   return false;
+  // }
+
+
+  checkCollisionWithAliens(army) {
+    // find lowest alien.  only continue of they are at top of bunker
+    let lowestAlienY = army.lowestAlienBottom();
+    if (lowestAlienY < bunkerTop) return;
+
+    for (let j = 0; j < this.cols; j++) {  // row
+      for (let i = 0; i < this.rows; i++) {  // col
+        if (this.cells[j][i].checkCollisionWithAliens(army)) {
+          this.cells[j][i].intact = false;
+        }
+      }
+    }
+  }
 }
