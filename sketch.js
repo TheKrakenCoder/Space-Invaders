@@ -56,7 +56,7 @@ function setup() {
   bunkers.push(new Bunker(width-200, bunkerTop));
   initialUpdateTime = 1000;
   // initialUpdateTime = 100;
-  alienChanceToShoot = 0.075;
+  alienChanceToShoot = 0.050;
   alienChanceToShootScale = 3.5;
   numUpdates = 0;
 
